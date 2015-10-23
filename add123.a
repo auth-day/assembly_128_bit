@@ -1,0 +1,44 @@
+
+global	add128
+
+dst	equ	0x08	; первый аргумент будет содержать ответ в себе
+src	equ	0x0C	; второй источник
+
+section	.text
+add128:
+	push	ebp		;stack frame
+	mov	ebp, esp
+	push	esi		;сохраняем регистры перед использованием
+	push	edi			
+	push	ebx
+
+	mov	edi, [ebp+dst]  ; записываем в регистр адрес начала массива 
+	mov	esi, [ebp+src]	; адрес начала массива источника 
+	xor	ebx, ebx		; обнуляем счётчик 
+
+	mov	eax, [edi+ebx*4] ; в регистр eax то, что находиться по адресу edi(адрес начала массива + 0 * 4)
+	add	eax, [esi+ebx*4] ; склаываем с источником
+	mov	[edi+ebx*4], eax ; а теперь результат сложения записываем в адрес начала массива . флаг переноса 1
+	inc	ebx				 ; увеличиваем счётчик на один
+
+	mov	eax, [edi+ebx*4] ; дальше тоже самое, только с учётом флага переноса
+	adc	eax, [esi+ebx*4]
+	mov	[edi+ebx*4], eax
+	inc	ebx
+
+	mov	eax, [edi+ebx*4]
+	adc	eax, [esi+ebx*4]
+	mov	[edi+ebx*4], eax
+	inc	ebx
+
+	mov	eax, [edi+ebx*4]
+	adc	eax, [esi+ebx*4]
+	mov	[edi+ebx*4], eax
+	inc	ebx
+
+	pop	ebx
+	pop	edi
+	pop	esi
+	mov	esp, ebp
+	pop	ebp
+	ret
